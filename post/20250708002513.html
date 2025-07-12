@@ -1,0 +1,206 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Git设置追踪分支 | 雪绘乌冬的Blog</title><meta name="author" content="雪绘乌冬"><meta name="copyright" content="雪绘乌冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="随着项目发展，Git仓库逐渐庞大，分支越来越多，我察觉到pull和clone的时间变得越来越久。由于pull会更新所有索引，因此每次pull会拉取到自己不想关注的分支，浪费下载时间和存储空间。当然我也可以每次pull或fetch都只更新一个分支，但我觉得这样有点繁琐。因为当前项目存在以下几点情况，所以我更喜欢pull：  需要经常更新，包括tag 需要同时关注好几个分支 经常需要checkout、">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git设置追踪分支">
+<meta property="og:url" content="http://example.com/post/20250708002513.html">
+<meta property="og:site_name" content="雪绘乌冬的Blog">
+<meta property="og:description" content="随着项目发展，Git仓库逐渐庞大，分支越来越多，我察觉到pull和clone的时间变得越来越久。由于pull会更新所有索引，因此每次pull会拉取到自己不想关注的分支，浪费下载时间和存储空间。当然我也可以每次pull或fetch都只更新一个分支，但我觉得这样有点繁琐。因为当前项目存在以下几点情况，所以我更喜欢pull：  需要经常更新，包括tag 需要同时关注好几个分支 经常需要checkout、">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/git.png">
+<meta property="article:published_time" content="2025-07-07T16:25:13.000Z">
+<meta property="article:modified_time" content="2025-07-09T17:22:51.373Z">
+<meta property="article:author" content="雪绘乌冬">
+<meta property="article:tag" content="git">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/git.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Git设置追踪分支",
+  "url": "http://example.com/post/20250708002513.html",
+  "image": "http://example.com/img/git.png",
+  "datePublished": "2025-07-07T16:25:13.000Z",
+  "dateModified": "2025-07-09T17:22:51.373Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "雪绘乌冬",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="http://example.com/post/20250708002513.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Git设置追踪分支',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/background.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/head-icon2.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">4</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">雪绘乌冬的Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">Git设置追踪分支</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">Git设置追踪分支</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-07-07T16:25:13.000Z" title="发表于 2025-07-08 00:25:13">2025-07-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-07-09T17:22:51.373Z" title="更新于 2025-07-10 01:22:51">2025-07-10</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%B7%A5%E4%BD%9C%E6%B5%81/">工作流</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><p>随着项目发展，Git仓库逐渐庞大，分支越来越多，我察觉到pull和clone的时间变得越来越久。<br>由于pull会更新所有索引，因此每次pull会拉取到自己不想关注的分支，浪费下载时间和存储空间。<br>当然我也可以每次pull或fetch都只更新一个分支，但我觉得这样有点繁琐。<br>因为当前项目存在以下几点情况，所以我更喜欢pull：</p>
+<ol>
+<li>需要经常更新，包括tag</li>
+<li>需要同时关注好几个分支</li>
+<li>经常需要checkout、merge、pick，这类在多个分支之间的操作</li>
+</ol>
+<p>通过设置追踪的远端分支，pull只会拉取固定的几个分支，正好满足我的需求。<br>这么做唯一的缺点是：无法及时看到非追踪分支更新，此时就需要再手动添加追踪分支。</p>
+<h3 id="相关指令"><a href="#相关指令" class="headerlink" title="相关指令"></a>相关指令</h3><p>重置追踪的远端分支为某分支</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote set-branches origin 分支名1 分支名2 分支名3</span><br></pre></td></tr></table></figure>
+
+<p>重置追踪分支后，后续再添加其他追踪的远端分支</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote set-branches --add origin dev</span><br></pre></td></tr></table></figure>
+
+<p>设置的分支名支持正则，比如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote set-branches --add origin dev_*</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="清理未追踪分支"><a href="#清理未追踪分支" class="headerlink" title="清理未追踪分支"></a>清理未追踪分支</h3><p>如果你的git本地仓库已经更新过其他的远端分支，需要再执行以下步骤清理</p>
+<ol>
+<li>指令设置好追踪分支后，找到”工程目录.git\packed-refs”文件，删除其他分支的引用，注意最后一行空行需要保留</li>
+</ol>
+<style>.emnggpawpdvq{zoom: 67%;}</style><img src="/post/20250708002513/image-20250708202116694.png" class="emnggpawpdvq" alt="image-20250708202116694">
+
+<ol start="2">
+<li><p>删除”.git\info\refs”文件，没有就不管</p>
+</li>
+<li><p>删除”.git\refs\remotes\origin”目录下所有文件</p>
+</li>
+<li><p>接着执行一次pull，可以看到只更新了追踪的几个分支</p>
+</li>
+<li><p>执行完上述操作后，再执行gc减少占用空间，执行指令</p>
+</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git gc --prune=now</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="检查追踪分支"><a href="#检查追踪分支" class="headerlink" title="检查追踪分支"></a>检查追踪分支</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch -r</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="单分支clone"><a href="#单分支clone" class="headerlink" title="单分支clone"></a>单分支clone</h3><p>如果新clone一个工程，可以使用单分支clone指令，clone后的本地仓库默认只会追踪这一个分支</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone --single-branch --branch 分支名 远端仓库url</span><br></pre></td></tr></table></figure>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/git/">git</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/post/20250708230013.html" title="《死神商馆》攻略"><img class="cover" src="/img/game/shinigami.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">《死神商馆》攻略</div></div><div class="info-2"><div class="info-item-1">写在前面这是一篇黄游攻略，如果你是误点进来，可以关闭了。 【入正地址】 这个游戏挺不错的，只不过有些地方容易卡关。一是引导一般，二是部分事件推进需要看剧情。加上中文攻略基本没有，我通关这游戏全靠摸索，因此写下攻略帮助后来者。 重要按键整个游戏流程非常肝，必须知道怎么加速，建议按F8加速再配合CE变速。 F1：全屏 F2&#x2F;F3：缩小分辨率&#x2F;增加分辨率 F7&#x2F;F8：减速&#x2F;加速（需要购买女仆的加速服务才能解锁） 空格：暂停 CE使用方式这游戏数值没有加密，直接搜数值或者搜变化就能搜出来。包括人物等级、金币、职业等级。 需要注意的是：  金币要用long型，也就是8字节，不然不够游戏后期用的。 怪物等级和主角的等级有关系，别改主角等级，改其他角色就行。  可能很多人不了解的功能先讲最重要也是很多人不知道的，后面有BOSS需要用指定技能，具体看图里标注。 战斗界面里攻击技能和自动释放的技能，可以通过右键技能栏先取消然后左键换技能。 部分辅助技能需要右键角色后释放。 .iahecabwgohr{zoom:50%;}    店员界面下方是当前各部门配置，...</div></div></div></a><a class="pagination-related" href="/post/20250707212513.html" title="Unity编辑器资源导入相关笔记"><img class="cover" src="/img/unity-6.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Unity编辑器资源导入相关笔记</div></div><div class="info-2"><div class="info-item-1">作为Unity开发者需要经常和资源打交道，你可能只了解Assets、Library这些基础概念，这已经足够日常开发了。但你是否有过编译时长太久、资源导入时长太久的困扰？是否不想每次资源出问题、Unity打不开就删掉Library浪费大量时间重新启动？如果你对资源导入相关知识感兴趣，或者希望找到这些问题的解决方法，可以参考下本篇文章。 以下内容基于Asset Import Pipelline V2介绍，即Unity 2019.3或以上版本。 资源导入缓存Library&#x2F;SourceAssetDB包含资源的元数据，例如最后修改日期、文件内容哈希、GUID等。Unity用这些信息来判断文件是否被修改，从而决定是否应该重新导入。 Library&#x2F;ArtifactDB记录资源导入结果。包含依赖项、元数据和文件列表。 Library&#x2F;metadataAsset Import Pipelline V1的导入结果存放于Library&#x2F;metadata，以资源GUID作为文件名  Library&#x2F;ArtifactsAsset Import Pipe...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/head-icon2.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">雪绘乌冬</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">4</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/YukieUdon" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/post/20250709020553.html" title="hexo显示不了图片问题排查记录"><img src="/img/hexo.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="hexo显示不了图片问题排查记录"/></a><div class="content"><a class="title" href="/post/20250709020553.html" title="hexo显示不了图片问题排查记录">hexo显示不了图片问题排查记录</a><time datetime="2025-07-08T18:05:53.000Z" title="发表于 2025-07-09 02:05:53">2025-07-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/20250708230013.html" title="《死神商馆》攻略"><img src="/img/game/shinigami.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="《死神商馆》攻略"/></a><div class="content"><a class="title" href="/post/20250708230013.html" title="《死神商馆》攻略">《死神商馆》攻略</a><time datetime="2025-07-08T15:00:13.000Z" title="发表于 2025-07-08 23:00:13">2025-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/20250708002513.html" title="Git设置追踪分支"><img src="/img/git.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Git设置追踪分支"/></a><div class="content"><a class="title" href="/post/20250708002513.html" title="Git设置追踪分支">Git设置追踪分支</a><time datetime="2025-07-07T16:25:13.000Z" title="发表于 2025-07-08 00:25:13">2025-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/20250707212513.html" title="Unity编辑器资源导入相关笔记"><img src="/img/unity-6.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Unity编辑器资源导入相关笔记"/></a><div class="content"><a class="title" href="/post/20250707212513.html" title="Unity编辑器资源导入相关笔记">Unity编辑器资源导入相关笔记</a><time datetime="2025-07-07T13:25:13.000Z" title="发表于 2025-07-07 21:25:13">2025-07-07</time></div></div></div></div></div></div></main></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Unity编辑器资源导入相关笔记 | 雪绘乌冬的Blog</title><meta name="author" content="雪绘乌冬"><meta name="copyright" content="雪绘乌冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="作为Unity开发者需要经常和资源打交道，你可能只了解Assets、Library这些基础概念，这已经足够日常开发了。但你是否有过编译时长太久、资源导入时长太久的困扰？是否不想每次资源出问题、Unity打不开就删掉Library浪费大量时间重新启动？如果你对资源导入相关知识感兴趣，或者希望找到这些问题的解决方法，可以参考下本篇文章。 以下内容基于Asset Import Pipelline V2介">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unity编辑器资源导入相关笔记">
+<meta property="og:url" content="http://example.com/post/20250707212513.html">
+<meta property="og:site_name" content="雪绘乌冬的Blog">
+<meta property="og:description" content="作为Unity开发者需要经常和资源打交道，你可能只了解Assets、Library这些基础概念，这已经足够日常开发了。但你是否有过编译时长太久、资源导入时长太久的困扰？是否不想每次资源出问题、Unity打不开就删掉Library浪费大量时间重新启动？如果你对资源导入相关知识感兴趣，或者希望找到这些问题的解决方法，可以参考下本篇文章。 以下内容基于Asset Import Pipelline V2介">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/unity-6.png">
+<meta property="article:published_time" content="2025-07-07T13:25:13.000Z">
+<meta property="article:modified_time" content="2025-07-12T12:00:27.495Z">
+<meta property="article:author" content="雪绘乌冬">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="资源">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/unity-6.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Unity编辑器资源导入相关笔记",
+  "url": "http://example.com/post/20250707212513.html",
+  "image": "http://example.com/img/unity-6.png",
+  "datePublished": "2025-07-07T13:25:13.000Z",
+  "dateModified": "2025-07-12T12:00:27.495Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "雪绘乌冬",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="http://example.com/post/20250707212513.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Unity编辑器资源导入相关笔记',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/background.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/head-icon2.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">4</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">雪绘乌冬的Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">Unity编辑器资源导入相关笔记</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">Unity编辑器资源导入相关笔记</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-07-07T13:25:13.000Z" title="发表于 2025-07-07 21:25:13">2025-07-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-07-12T12:00:27.495Z" title="更新于 2025-07-12 20:00:27">2025-07-12</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Unity/">Unity</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><p>作为Unity开发者需要经常和资源打交道，你可能只了解Assets、Library这些基础概念，这已经足够日常开发了。<br>但你是否有过编译时长太久、资源导入时长太久的困扰？是否不想每次资源出问题、Unity打不开就删掉Library浪费大量时间重新启动？<br>如果你对资源导入相关知识感兴趣，或者希望找到这些问题的解决方法，可以参考下本篇文章。</p>
+<p>以下内容基于Asset Import Pipelline V2介绍，即Unity 2019.3或以上版本。</p>
+<h2 id="资源导入缓存"><a href="#资源导入缓存" class="headerlink" title="资源导入缓存"></a>资源导入缓存</h2><p><strong>Library&#x2F;SourceAssetDB</strong><br>包含资源的元数据，例如最后修改日期、文件内容哈希、GUID等。Unity用这些信息来判断文件是否被修改，从而决定是否应该重新导入。</p>
+<p><strong>Library&#x2F;ArtifactDB</strong><br>记录资源导入结果。包含依赖项、元数据和文件列表。</p>
+<p><strong>Library&#x2F;metadata</strong><br>Asset Import Pipelline V1的导入结果存放于Library&#x2F;metadata，以资源GUID作为文件名</p>
+<p><img src="/post/20250707212513/1751909404087-40.png" alt="img"></p>
+<p><strong>Library&#x2F;Artifacts</strong><br>Asset Import Pipelline V2的导入结果存放于Library&#x2F;Artifacts，以资源的所有依赖的哈希值作为文件名</p>
+<p><img src="/post/20250707212513/1751909404085-33.png" alt="img"></p>
+<p>V2切换平台所需时间比V1少。这是因为以往的资源导入结果都是用GUID来存储的，而GUID不会变，所以切换平台时只能通过改变内容使资源适应不同平台。V2通过引入依赖项来解决，并且缓存不同平台的导入结果，切换平台就不用再重新导入了。</p>
+<h2 id="Unity的Refresh"><a href="#Unity的Refresh" class="headerlink" title="Unity的Refresh"></a>Unity的Refresh</h2><h3 id="Refresh执行顺序"><a href="#Refresh执行顺序" class="headerlink" title="Refresh执行顺序"></a>Refresh执行顺序</h3><ol>
+<li>查找资源文件的更改，然后更新源资源数据库</li>
+<li>导入并编译与代码相关的文件，例如 .dll、.asmdef、.asmref、.rsp 和 .cs 文件。</li>
+<li>如果Refresh不是从脚本调用的，会重新加载域。</li>
+<li>对所有与代码相关的资源进行导入后处理</li>
+<li>导入与代码无关的资源，并对剩余资源进行导入后处理</li>
+<li>最后热重载资源</li>
+</ol>
+<h3 id="触发重新Refresh的情况"><a href="#触发重新Refresh的情况" class="headerlink" title="触发重新Refresh的情况"></a>触发重新Refresh的情况</h3><ul>
+<li>某个资源导入失败</li>
+<li>资源在 Refresh 中的导入阶段被更改</li>
+<li>资源在导入时生成了其他资源</li>
+<li>在预处理&#x2F;后处理回调方法中强制重导某个文件，例如：在 OnPostProcessAllAssets 方法中使用 AssetDatabase.ForceReserializeAssets 方法或 AssetImport.SaveAndReimport 方法。需要注意避免无限重导入。</li>
+<li>编译脚本后，需要重新加载程序集</li>
+<li>以“Text only”保存资源，但某些资源必须被序列化为二进制格式，此时就会触发 Refresh 处理。例如：带有地形的场景必须被序列化为二进制格式，因为文本格式太笨重</li>
+</ul>
+<h2 id="资源依赖"><a href="#资源依赖" class="headerlink" title="资源依赖"></a>资源依赖</h2><p>当某个资源A使用了另一个资源B，就可以称B为A的依赖，称A为B的引用。资源的导入设置、目标平台等也是依赖。资源的依赖能够影响导入结果。当资源的任一依赖发生变更后，都会使资源的导入缓存过时，从而引起资源重新导入。</p>
+<p>使用AssetDatabase.GetDependencies可以获取资源的直接依赖。如果需要频繁获取资源的依赖，可以将获取的资源依赖缓存下来，并使用AssetDatabase.GetAssetDependencyHash来判断是否需要更新缓存。</p>
+<p>另外也可以借助工具查找资源的引用，比如 <a target="_blank" rel="noopener" href="https://assetstore.unity.com/packages/tools/utilities/maintainer-32199?locale=zh-CN">Maintainer</a> 。</p>
+<h2 id="资源规范方案"><a href="#资源规范方案" class="headerlink" title="资源规范方案"></a>资源规范方案</h2><p><a target="_blank" rel="noopener" href="https://docs.unity3d.org.cn/6000.0/Documentation/ScriptReference/AssetPostprocessor.html">AssetPostprocessor</a></p>
+<p><a target="_blank" rel="noopener" href="https://docs.unity3d.org.cn/6000.0/Documentation/ScriptReference/AssetImporter.html">AssetImporter</a></p>
+<p><a target="_blank" rel="noopener" href="https://docs.unity3d.org.cn/6000.0/Documentation/Manual/Presets.html">Presets</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Unity-Technologies/AssetGraph">AssetGraph</a></p>
+<p>提示：在用AssetPostprocessor或AssetImporter做资源规范处理时，可以用AssetImporter.importSettingsMissing判断是否第一次导入，如果导入资源时未附带meta文件，则此值为 true。或者在AssetImporter.userdata加入标记，比如assetImporter.userData &#x3D; “v1”;，userdata可以在meta文件中看到。</p>
+<h2 id="资源导入调试"><a href="#资源导入调试" class="headerlink" title="资源导入调试"></a>资源导入调试</h2><p><a target="_blank" rel="noopener" href="https://docs.unity3d.org.cn/6000.0/Documentation/Manual/ImportActivityWindow.html">Unity Docs - Import Activity Window</a><br>界面入口：Window-&gt;Analysis-&gt;Import Activity。诸如导入时间、时长、原因，以及资源本身信息如GUID、资源依赖和Library缓存位置应有尽有</p>
+<p><img src="/post/20250707212513/1751909404086-34.png" alt="img"></p>
+<h3 id="导入日志记录"><a href="#导入日志记录" class="headerlink" title="导入日志记录"></a>导入日志记录</h3><p>当出现导入资源异常时，可以根据以下两个日志排查：</p>
+<ul>
+<li>Editor.log，Unity编辑器几乎所有的日志都在这里，存放路径为”C:\Users\用户名\AppData\Local\Unity\Editor\Editor.log”</li>
+<li>Logs&#x2F;AssetImportWorkerxxx.log，导入日志</li>
+</ul>
+<p>也可以在代码中用这个接口来获取导入日志：AssetImporter.GetImportLog</p>
+<h2 id="导入加速"><a href="#导入加速" class="headerlink" title="导入加速"></a>导入加速</h2><h3 id="编译加速"><a href="#编译加速" class="headerlink" title="编译加速"></a>编译加速</h3><h4 id="分析编译时长"><a href="#分析编译时长" class="headerlink" title="分析编译时长"></a>分析编译时长</h4><p>以下代码可以在编译后打印编译时长</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AssemblyCompilationReporter</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">InitializeOnLoadMethod</span>]</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Init</span>()</span></span><br><span class="line">    &#123;</span><br><span class="line">        CompilationPipeline.assemblyCompilationStarted += CompilationPipelineOnAssemblyCompilationStarted;</span><br><span class="line">        CompilationPipeline.assemblyCompilationFinished += CompilationPipelineOnAssemblyCompilationFinished;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">CompilationPipelineOnAssemblyCompilationFinished</span>(<span class="params"><span class="built_in">string</span> s, CompilerMessage[] compilerMessages</span>)</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">var</span> startTime = <span class="keyword">new</span> DateTime(Convert.ToInt64(EditorPrefs.GetString(<span class="string">$&quot;CompileStartTime<span class="subst">&#123;s&#125;</span>&quot;</span>)));</span><br><span class="line">        Debug.Log(<span class="string">$&quot;=== CompilationPipeline Assembly Finished <span class="subst">&#123;s&#125;</span> (<span class="subst">&#123;(DateTime.Now - startTime).ToString(<span class="string">&quot;s\\.fff&quot;</span>)&#125;</span>s)&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">CompilationPipelineOnAssemblyCompilationStarted</span>(<span class="params"><span class="built_in">string</span> s</span>)</span></span><br><span class="line">    &#123;</span><br><span class="line">        EditorPrefs.SetString(<span class="string">$&quot;CompileStartTime<span class="subst">&#123;s&#125;</span>&quot;</span>, Convert.ToString(DateTime.Now.Ticks));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外也可以借助工具来分析</p>
+<ul>
+<li>Compiling Indicator - Wait Relaxed（AssetStore已下架）</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/needle-tools/compilation-visualizer">https://github.com/needle-tools/compilation-visualizer</a></li>
+</ul>
+<h4 id="划分程序集"><a href="#划分程序集" class="headerlink" title="划分程序集"></a>划分程序集</h4><p>当代码变动时，只会重新编译当前程序集和引用程序集，因此可以通过划分程序集减少编译时间。<br>以下是Unity的预定义程序集及编译顺序：</p>
+<table>
+<thead>
+<tr>
+<th><strong>阶段</strong></th>
+<th><strong>程序集名称</strong></th>
+<th><strong>脚本文件</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Assembly-CSharp-firstpass</td>
+<td>名为 Standard Assets、Pro Standard Assets 和 Plugins 的文件夹中的运行时脚本。</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Assembly-CSharp-Editor-firstpass</td>
+<td>名为 Editor 的文件夹（位于名为 Standard Assets、Pro Standard Assets 和 Plugins 的顶级文件夹中的任意位置）中的 Editor 脚本。</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Assembly-CSharp</td>
+<td>不在名为 Editor 的文件夹中的所有其他脚本。</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Assembly-CSharp-Editor</td>
+<td>其余所有脚本（位于名为 Editor 的文件夹中的脚本）</td>
+</tr>
+</tbody></table>
+<p>一般运行时的代码都放在Assembly-CSharp，可以将不常变动的代码移至Assembly-CSharp-firstpass，例如将插件放到Plugins目录。</p>
+<p>除了Unity预定义的程序集以外，可以自定义程序集，有以下两种做法：</p>
+<ol>
+<li>将C#代码编译为DLL</li>
+<li>使用AssemblyDefine来划分，具体使用方式参考<a target="_blank" rel="noopener" href="https://docs.unity3d.com/6000.2/Documentation/Manual/assembly-definitions-creating.html">Unity Docs - assembly-definitions-creating</a></li>
+</ol>
+<h4 id="增量编译"><a href="#增量编译" class="headerlink" title="增量编译"></a>增量编译</h4><ul>
+<li><a target="_blank" rel="noopener" href="https://assetstore.unity.com/packages/tools/integration/roslyn-c-runtime-compiler-142753?locale=zh-CN">Roslyn C# - Runtime Compiler</a></li>
+<li><a target="_blank" rel="noopener" href="https://discussions.unity.com/t/unity-incremental-c-compiler-deprecated/696404">Unity2018以前官方提供的增量编译插件</a></li>
+</ul>
+<h4 id="后台编译"><a href="#后台编译" class="headerlink" title="后台编译"></a>后台编译</h4><p>通常我们在VS里改完代码后，需要回到Unity编辑器重新激活窗口才会重新编译。按照以下步骤可以改成每次保存文件时立刻执行编译：</p>
+<ol>
+<li>Unity PlayerSetting里，Windows平台勾选Run In Background</li>
+<li>添加 <a target="_blank" rel="noopener" href="https://github.com/baba-s/unity-compile-in-background">unity-compile-in-background</a></li>
+</ol>
+<p>除了上述方法以外，也可以尝试优化代码里各种在编译前后执行的逻辑，比如<a target="_blank" rel="noopener" href="https://docs.unity3d.com/cn/2020.3/Manual/RunningEditorCodeOnLaunch.html">InitializeOnLoad</a>。</p>
+<h3 id="编辑器运行时C-热重载"><a href="#编辑器运行时C-热重载" class="headerlink" title="编辑器运行时C#热重载"></a>编辑器运行时C#热重载</h3><p>当编辑器正在运行时修改代码，需要修改选项Editor-&gt;Preferences-&gt;General-&gt;Script Changes While Playing为Recompile And Continue Playing。重新编译并继续运行。重新编译会重置域，因此容易出现异常。</p>
+<p>借助一些插件可以一定程度上解决重置域带来的问题：<a target="_blank" rel="noopener" href="https://github.com/handzlikchris/FastScriptReload">Fast Script Reload</a>、<a target="_blank" rel="noopener" href="https://hotreload.net/documentation">Hot Reload</a>。</p>
+<p>另外，<a target="_blank" rel="noopener" href="https://docs.unity3d.com/cn/2020.3/Manual/ConfigurableEnterPlayMode.html">禁用Play时Reload Domain</a> 可以减少Unity编辑器从点击Play到运行的时间。</p>
+<h3 id="Shader异步编译"><a href="#Shader异步编译" class="headerlink" title="Shader异步编译"></a>Shader异步编译</h3><p>如果发现每次改动Shader后编译时间非常长，可以尝试比较下开&#x2F;关Shader异步编译后的编译时长。因为Shader异步编译实际是将部分Shader数据传给Unity的境外服务器并等待返回，因此可能受网络影响。</p>
+<h3 id="批量处理资源变动"><a href="#批量处理资源变动" class="headerlink" title="批量处理资源变动"></a>批量处理资源变动</h3><p>当处理资源时，调用以下资源变动接口会触发Unity资源导入，如果不做调整，每次调用都会触发一次导入，会耗费大量时间。</p>
+<ul>
+<li>AssetDatabase.ImportAsset</li>
+<li>AssetDatabase.MoveAsset</li>
+<li>AssetDatabase.CopyAsset</li>
+<li>AddObjectToAsset</li>
+</ul>
+<p>可以让Unity批量导入这期间操作的所有资源，通过以下方式：</p>
+<ol>
+<li>在大量执行以上操作前先执行 AssetDatabase.StartAssetEditing();</li>
+<li>在执行完所有资源操作后再执行 AssetDatabase.StopAssetEditing();</li>
+</ol>
+<h3 id="资源并行导入"><a href="#资源并行导入" class="headerlink" title="资源并行导入"></a>资源并行导入</h3><p><img src="/post/20250707212513/1751909404086-35.png" alt="img"></p>
+<h3 id="设置资源占用内核数量"><a href="#设置资源占用内核数量" class="headerlink" title="设置资源占用内核数量"></a>设置资源占用内核数量</h3><style>.blmnhxydlmac{}</style><img src="/post/20250707212513/1751909404086-36.png" class="blmnhxydlmac" alt="img">
+
+
+
+<h3 id="忽略文件夹"><a href="#忽略文件夹" class="headerlink" title="忽略文件夹"></a>忽略文件夹</h3><p>在导入过程中，Unity 忽略 <strong>Assets</strong> 文件夹（或其子文件夹）中的以下文件和文件夹：</p>
+<ul>
+<li>隐藏的文件夹。</li>
+<li>以“<strong>.</strong>”开头的文件和文件夹。</li>
+<li>以“<strong>~</strong>”结尾的文件和文件夹。</li>
+<li>名为 <strong>cvs</strong> 的文件和文件夹。</li>
+<li>扩展名为 <strong>.tmp</strong> 的文件。</li>
+</ul>
+<h3 id="Cache-Server-Unity-Accelerator"><a href="#Cache-Server-Unity-Accelerator" class="headerlink" title="Cache Server&#x2F;Unity Accelerator"></a>Cache Server&#x2F;Unity Accelerator</h3><p><a target="_blank" rel="noopener" href="https://docs.unity3d.org.cn/6000.0/Documentation/Manual/UnityAccelerator.html">Unity Accelerator</a></p>
+<p>大致原理：团队其中一个人导入完资源后，会上传至缓存服务器，团队其他人在导入资源时从缓存服务器获取，无需再重新导入这些资源。</p>
+<p>Preferences和ProjectSetting都可以配置。</p>
+<p>Cache Server对应Asset Import Pipelline V1，Unity Accelerator对应Asset Import Pipelline V2。</p>
+<p><img src="/post/20250707212513/1751909404086-37.png" alt="img"></p>
+<p>注意：使用Cache Server疑似会导致错误导入资源的概率增加，怀疑可能是因为当某个工程错误导入某个资源后会将错误数据上传到Server。如果使用时发现这种情况增加，可以考虑是不是缓存服务器导致的。</p>
+<h2 id="Unity启动过程"><a href="#Unity启动过程" class="headerlink" title="Unity启动过程"></a>Unity启动过程</h2><ol>
+<li>证书验证</li>
+<li>Package Manager</li>
+<li>编译</li>
+<li>资源导入</li>
+</ol>
+<p>当你发现Unity启动崩溃了，可以尝试根据Unity在哪一步崩溃来判断问题。</p>
+<h2 id="Library文件含义"><a href="#Library文件含义" class="headerlink" title="Library文件含义"></a>Library文件含义</h2><p>编辑器出问题不要急着把整个Library删掉，可以尝试先删除可能有问题的文件。Library的文件大部分看名字就能判断出大概用途：</p>
+<ul>
+<li>Artifacts、ArtifactDB、SourceAssetDB：资源缓存、资源数据库相关</li>
+<li>AtlasCache、SpriteAtlasDatabase.asset：图集缓存</li>
+<li>Bee：增量构建缓存，打包时用的</li>
+<li>ShaderCache、ShaderCache.db：Shader缓存</li>
+<li>ScriptAssemblies、ScriptMapper：代码、编译相关、</li>
+<li>PackageCache、PackageManager：插件包相关</li>
+</ul>
+<p>举几个例子：</p>
+<ul>
+<li>打包报错，删除Bee文件夹解决</li>
+</ul>
+<p><img src="/post/20250707212513/1751909404086-38.jpeg" alt="img"></p>
+<ul>
+<li><p>莫名奇妙的编译报错，看着明明没问题却报错，或者是某个没改过的插件或Unity内部代码提示编译报错。可以试试以下步骤：</p>
+<ul>
+<li>关闭untiy</li>
+<li>删除工程下所有.csproject、.sln文件</li>
+<li>删除Library&#x2F;ScriptAssemblies文件夹</li>
+<li>重新打开untiy</li>
+</ul>
+</li>
+<li><p>在编辑器里运行游戏使用了图集，发现图集异常比如变白块，可以把Library下图集缓存删了。</p>
+</li>
+</ul>
+<hr>
+<blockquote>
+<p>参考文档</p>
+<p><a target="_blank" rel="noopener" href="https://docs.unity3d.org.cn/6000.0/Documentation/Manual/AssetWorkflow.html">Unity Docs - Asset Workflow</a></p>
+<p><a target="_blank" rel="noopener" href="https://docs.unity3d.org.cn/6000.0/Documentation/Manual/ImportActivityWindow.html">Unity Docs - ImportActivityWindow</a></p>
+<p><a target="_blank" rel="noopener" href="https://docs.unity3d.com/cn/current/Manual/AssetDatabaseRefreshing.html">Unity Docs - AssetDatabaseRefreshing</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=S2P9n5U9xVw">Youtube - AssetDatabase.Refresh() refresher - Unite Copenhagen</a></p>
+<p><a target="_blank" rel="noopener" href="https://unity.com/blog/engine-platform/new-asset-import-pipeline-for-speeding-up-asset-imports">The new Asset Import Pipeline: Solid foundation for speeding up asset imports</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Unity/">Unity</a><a class="post-meta__tags" href="/tags/%E8%B5%84%E6%BA%90/">资源</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/post/20250708002513.html" title="Git设置追踪分支"><img class="cover" src="/img/git.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Git设置追踪分支</div></div><div class="info-2"><div class="info-item-1">随着项目发展，Git仓库逐渐庞大，分支越来越多，我察觉到pull和clone的时间变得越来越久。由于pull会更新所有索引，因此每次pull会拉取到自己不想关注的分支，浪费下载时间和存储空间。当然我也可以每次pull或fetch都只更新一个分支，但我觉得这样有点繁琐。因为当前项目存在以下几点情况，所以我更喜欢pull：  需要经常更新，包括tag 需要同时关注好几个分支 经常需要checkout、merge、pick，这类在多个分支之间的操作  通过设置追踪的远端分支，pull只会拉取固定的几个分支，正好满足我的需求。这么做唯一的缺点是：无法及时看到非追踪分支更新，此时就需要再手动添加追踪分支。 相关指令重置追踪的远端分支为某分支 1git remote set-branches origin 分支名1 分支名2 分支名3  重置追踪分支后，后续再添加其他追踪的远端分支 1git remote set-branches --add origin dev  设置的分支名支持正则，比如： 1git remote set-branches --add origin dev_*    清...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/head-icon2.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">雪绘乌冬</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">4</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/YukieUdon" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/post/20250709020553.html" title="hexo显示不了图片问题排查记录"><img src="/img/hexo.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="hexo显示不了图片问题排查记录"/></a><div class="content"><a class="title" href="/post/20250709020553.html" title="hexo显示不了图片问题排查记录">hexo显示不了图片问题排查记录</a><time datetime="2025-07-08T18:05:53.000Z" title="发表于 2025-07-09 02:05:53">2025-07-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/20250708230013.html" title="《死神商馆》攻略"><img src="/img/game/shinigami.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="《死神商馆》攻略"/></a><div class="content"><a class="title" href="/post/20250708230013.html" title="《死神商馆》攻略">《死神商馆》攻略</a><time datetime="2025-07-08T15:00:13.000Z" title="发表于 2025-07-08 23:00:13">2025-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/20250708002513.html" title="Git设置追踪分支"><img src="/img/git.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Git设置追踪分支"/></a><div class="content"><a class="title" href="/post/20250708002513.html" title="Git设置追踪分支">Git设置追踪分支</a><time datetime="2025-07-07T16:25:13.000Z" title="发表于 2025-07-08 00:25:13">2025-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/20250707212513.html" title="Unity编辑器资源导入相关笔记"><img src="/img/unity-6.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Unity编辑器资源导入相关笔记"/></a><div class="content"><a class="title" href="/post/20250707212513.html" title="Unity编辑器资源导入相关笔记">Unity编辑器资源导入相关笔记</a><time datetime="2025-07-07T13:25:13.000Z" title="发表于 2025-07-07 21:25:13">2025-07-07</time></div></div></div></div></div></div></main></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
