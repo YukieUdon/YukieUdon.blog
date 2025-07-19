@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://yukieudon.github.io/project/post/20250707212513.html</loc>
+    <loc>https://yukieudon.github.io/post/20250707212513.html</loc>
     
     <lastmod>2025-07-19</lastmod>
     
@@ -11,7 +11,7 @@
   </url>
   
   <url>
-    <loc>https://yukieudon.github.io/project/post/20250708230013.html</loc>
+    <loc>https://yukieudon.github.io/post/20250708230013.html</loc>
     
     <lastmod>2025-07-19</lastmod>
     
@@ -20,7 +20,7 @@
   </url>
   
   <url>
-    <loc>https://yukieudon.github.io/project/about/index.html</loc>
+    <loc>https://yukieudon.github.io/about/index.html</loc>
     
     <lastmod>2025-07-12</lastmod>
     
@@ -29,7 +29,7 @@
   </url>
   
   <url>
-    <loc>https://yukieudon.github.io/project/post/20250709020553.html</loc>
+    <loc>https://yukieudon.github.io/post/20250709020553.html</loc>
     
     <lastmod>2025-07-12</lastmod>
     
@@ -38,7 +38,7 @@
   </url>
   
   <url>
-    <loc>https://yukieudon.github.io/project/categories/index.html</loc>
+    <loc>https://yukieudon.github.io/categories/index.html</loc>
     
     <lastmod>2025-07-12</lastmod>
     
@@ -47,7 +47,7 @@
   </url>
   
   <url>
-    <loc>https://yukieudon.github.io/project/tags/index.html</loc>
+    <loc>https://yukieudon.github.io/tags/index.html</loc>
     
     <lastmod>2025-07-12</lastmod>
     
@@ -56,7 +56,7 @@
   </url>
   
   <url>
-    <loc>https://yukieudon.github.io/project/post/20250708002513.html</loc>
+    <loc>https://yukieudon.github.io/post/20250708002513.html</loc>
     
     <lastmod>2025-07-09</lastmod>
     
@@ -66,7 +66,7 @@
   
 
   <url>
-    <loc>https://yukieudon.github.io/project</loc>
+    <loc>https://yukieudon.github.io/</loc>
     <lastmod>2025-07-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -74,35 +74,35 @@
 
   
   <url>
-    <loc>https://yukieudon.github.io/project/tags/git/</loc>
+    <loc>https://yukieudon.github.io/tags/git/</loc>
     <lastmod>2025-07-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yukieudon.github.io/project/tags/%E6%B8%B8%E6%88%8F/</loc>
+    <loc>https://yukieudon.github.io/tags/%E6%B8%B8%E6%88%8F/</loc>
     <lastmod>2025-07-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yukieudon.github.io/project/tags/hexo/</loc>
+    <loc>https://yukieudon.github.io/tags/hexo/</loc>
     <lastmod>2025-07-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yukieudon.github.io/project/tags/Unity/</loc>
+    <loc>https://yukieudon.github.io/tags/Unity/</loc>
     <lastmod>2025-07-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yukieudon.github.io/project/tags/%E8%B5%84%E6%BA%90/</loc>
+    <loc>https://yukieudon.github.io/tags/%E8%B5%84%E6%BA%90/</loc>
     <lastmod>2025-07-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -111,28 +111,28 @@
 
   
   <url>
-    <loc>https://yukieudon.github.io/project/categories/%E5%B7%A5%E4%BD%9C%E6%B5%81/</loc>
+    <loc>https://yukieudon.github.io/categories/%E5%B7%A5%E4%BD%9C%E6%B5%81/</loc>
     <lastmod>2025-07-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yukieudon.github.io/project/categories/%E6%B8%B8%E6%88%8F/</loc>
+    <loc>https://yukieudon.github.io/categories/%E6%B8%B8%E6%88%8F/</loc>
     <lastmod>2025-07-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yukieudon.github.io/project/categories/hexo/</loc>
+    <loc>https://yukieudon.github.io/categories/hexo/</loc>
     <lastmod>2025-07-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yukieudon.github.io/project/categories/Unity/</loc>
+    <loc>https://yukieudon.github.io/categories/Unity/</loc>
     <lastmod>2025-07-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
