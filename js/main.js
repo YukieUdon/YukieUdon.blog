@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const highlightFullpageEle = highlightFullpage ? '<i class="fa-solid fa-up-right-and-down-left-from-center fullpage-button"></i>' : ''
 
     const alertInfo = (ele, text) => {
-      if (GLOBAL_CONFIG.Snackbar !== undefined) {
+      if (GLOBAL_CONFIG.Snackbar !== undefined && ele !== null) {
         btf.snackbarShow(text)
       } else {
         ele.textContent = text
@@ -705,6 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (copyFont.length > limitCount) {
         textFont = `${copyFont}\n\n\n${languages.author}\n${languages.link}${window.location.href}\n${languages.source}\n${languages.info}`
       }
+      btf.snackbarShow(GLOBAL_CONFIG.copy.success)
       if (e.clipboardData) {
         return e.clipboardData.setData('text', textFont)
       } else {

@@ -4140,9 +4140,12 @@ figure.highlight pre .javascript .function {
 .container hr {
   margin: 20px 0;
 }
+#post .post_bottom {
+  border-top: 1px solid var(--dark-grey);
+  margin: 40px 0px 0px 0px;
+}
 #post .tag_share {
-  border-top: 1px solid var(--light-grey);
-  margin: 50px 0px 0px 0px;
+  margin: 5px 0px 0px 0px;
 }
 #post .tag_share:after {
   display: block;
@@ -4189,7 +4192,7 @@ figure.highlight pre .javascript .function {
 }
 #post .post-copyright {
   position: relative;
-  margin: 40px 0 10px;
+  margin: 20px 0 10px;
   padding: 10px 16px;
   border: 1px solid var(--light-grey);
   -webkit-transition: box-shadow 0.3s ease-in-out;

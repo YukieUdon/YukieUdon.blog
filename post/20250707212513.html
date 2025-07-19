@@ -173,9 +173,9 @@ btf.addGlobalFn('pjaxComplete', () => {
 <p><strong>SourceAssetDB</strong><br>包含资源的元数据，例如最后修改日期、文件内容哈希、GUID等。Unity用这些信息来判断文件是否被修改，从而决定是否应该重新导入。</p>
 <p><strong>ArtifactDB</strong><br>记录资源导入结果。包含依赖项、元数据和文件列表。</p>
 <p><strong>metadata</strong><br>Asset Import Pipelline V1的导入结果存放于Library&#x2F;metadata，以资源GUID作为文件名。</p>
-<p><img src="/project/post/20250707212513/1751909404087-40.png" alt="img"></p>
+<p><img src="/post/20250707212513/1751909404087-40.png" alt="img"></p>
 <p><strong>Artifacts</strong><br>Asset Import Pipelline V2的导入结果存放于Library&#x2F;Artifacts，以资源的所有依赖的哈希值作为文件名。</p>
-<p><img src="/project/post/20250707212513/1751909404085-33.png" alt="img"></p>
+<p><img src="/post/20250707212513/1751909404085-33.png" alt="img"></p>
 <p>V2切换平台所需时间比V1少。这是因为以往的资源导入结果都是用GUID来存储的，而GUID不会变，所以切换平台时只能通过改变内容使资源适应不同平台。V2通过引入依赖项来解决，并且缓存不同平台的导入结果，切换平台就不用再重新导入了。</p>
 <h2 id="Unity的Refresh"><a href="#Unity的Refresh" class="headerlink" title="Unity的Refresh"></a>Unity的Refresh</h2><h3 id="Refresh执行顺序"><a href="#Refresh执行顺序" class="headerlink" title="Refresh执行顺序"></a>Refresh执行顺序</h3><ol>
 <li>查找资源文件的更改，然后更新源资源数据库。</li>
@@ -202,7 +202,7 @@ btf.addGlobalFn('pjaxComplete', () => {
 <p><a target="_blank" rel="noopener" href="https://github.com/Unity-Technologies/AssetGraph">AssetGraph</a></p>
 <p>提示：在用AssetPostprocessor或AssetImporter做资源规范处理时，可以用AssetImporter.importSettingsMissing判断是否第一次导入，如果导入资源时未附带meta文件，则此值为 true。或者在AssetImporter.userdata加入标记，比如assetImporter.userData &#x3D; “v1”;，userdata可以在meta文件中看到。</p>
 <h2 id="资源导入调试"><a href="#资源导入调试" class="headerlink" title="资源导入调试"></a>资源导入调试</h2><p><a target="_blank" rel="noopener" href="https://docs.unity3d.org.cn/6000.0/Documentation/Manual/ImportActivityWindow.html">Unity Docs - Import Activity Window</a><br>界面入口：Window-&gt;Analysis-&gt;Import Activity。诸如导入时间、时长、原因，以及资源本身信息如GUID、资源依赖和Library缓存位置应有尽有。</p>
-<p><img src="/project/post/20250707212513/1751909404086-34.png" alt="img"></p>
+<p><img src="/post/20250707212513/1751909404086-34.png" alt="img"></p>
 <h3 id="导入日志记录"><a href="#导入日志记录" class="headerlink" title="导入日志记录"></a>导入日志记录</h3><p>当出现导入资源异常时，可以根据以下两个日志排查：</p>
 <ul>
 <li>Editor.log：Unity编辑器几乎所有的日志都在这里，存放路径为”C:\Users\用户名\AppData\Local\Unity\Editor\Editor.log”。</li>
@@ -279,8 +279,8 @@ btf.addGlobalFn('pjaxComplete', () => {
 <li>在大量执行以上操作前先执行 AssetDatabase.StartAssetEditing();</li>
 <li>在执行完所有资源操作后再执行 AssetDatabase.StopAssetEditing();</li>
 </ol>
-<h3 id="资源并行导入"><a href="#资源并行导入" class="headerlink" title="资源并行导入"></a>资源并行导入</h3><p><img src="/project/post/20250707212513/1751909404086-35.png" alt="img"></p>
-<h3 id="设置资源占用内核数量"><a href="#设置资源占用内核数量" class="headerlink" title="设置资源占用内核数量"></a>设置资源占用内核数量</h3><style>.irqoguqapbnn{}</style><img src="/project/post/20250707212513/1751909404086-36.png" class="irqoguqapbnn" alt="img">
+<h3 id="资源并行导入"><a href="#资源并行导入" class="headerlink" title="资源并行导入"></a>资源并行导入</h3><p><img src="/post/20250707212513/1751909404086-35.png" alt="img"></p>
+<h3 id="设置资源占用内核数量"><a href="#设置资源占用内核数量" class="headerlink" title="设置资源占用内核数量"></a>设置资源占用内核数量</h3><style>.ljcdggvvhuhi{}</style><img src="/post/20250707212513/1751909404086-36.png" class="ljcdggvvhuhi" alt="img">
 
 
 
@@ -296,7 +296,7 @@ btf.addGlobalFn('pjaxComplete', () => {
 <p>大致原理：团队其中一个人导入完资源后，会上传至缓存服务器，团队其他人在导入资源时从缓存服务器获取，无需再重新导入这些资源。</p>
 <p>Preferences和ProjectSetting都可以配置。</p>
 <p>Cache Server对应Asset Import Pipelline V1，Unity Accelerator对应Asset Import Pipelline V2。</p>
-<p><img src="/project/post/20250707212513/1751909404086-37.png" alt="img"></p>
+<p><img src="/post/20250707212513/1751909404086-37.png" alt="img"></p>
 <p>注意：使用Cache Server疑似会导致错误导入资源的概率增加，怀疑可能是因为当某个工程错误导入某个资源后会将错误数据上传到Server。如果使用时发现这种情况增加，可以考虑是不是缓存服务器导致的。</p>
 <h2 id="Unity启动过程"><a href="#Unity启动过程" class="headerlink" title="Unity启动过程"></a>Unity启动过程</h2><ol>
 <li>证书验证</li>
@@ -318,7 +318,7 @@ btf.addGlobalFn('pjaxComplete', () => {
 <ul>
 <li>打包报错，删除Bee文件夹解决</li>
 </ul>
-<p><img src="/project/post/20250707212513/1751909404086-38.jpeg" alt="img"></p>
+<p><img src="/post/20250707212513/1751909404086-38.jpeg" alt="img"></p>
 <ul>
 <li><p>莫名奇妙的编译报错，或者是某个没改过的插件或Unity内部代码提示编译报错。可以试试以下步骤：</p>
 <ul>
